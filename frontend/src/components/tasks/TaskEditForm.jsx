@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Button from '../ui/Button';
+import categoriaService from '../../services/categoryService';
 
 const TaskEditForm = ({ task, onSubmit, onCancel, loading }) => {
   const [formData, setFormData] = useState({
@@ -9,18 +10,32 @@ const TaskEditForm = ({ task, onSubmit, onCancel, loading }) => {
     description: '',
     priority: 'medium',
     status: 'pending',
-    due_date: ''
+    due_date: '',
+    category_id: ''
   });
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    const cargarCategorias = async () => {
+      try {
+        const datos = await categoriaService.obtenerCategorias();
+        setCategorias(datos);
+      } catch (err) {
+        console.error('Error cargando categorías:', err);
+      }
+    };
+    cargarCategorias();
+  }, []);
 
   useEffect(() => {
     if (task) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         title: task.title || '',
         description: task.description || '',
         priority: task.priority || 'medium',
         status: task.status || 'pending',
-        due_date: task.due_date ? task.due_date.split('T')[0] : ''
+        due_date: task.due_date ? task.due_date.split('T')[0] : '',
+        category_id: task.category_id || ''
       });
     }
   }, [task]);
@@ -47,13 +62,18 @@ const TaskEditForm = ({ task, onSubmit, onCancel, loading }) => {
     { value: 'completed', label: 'Completada' },
   ];
 
+  const categoryOptions = [
+    { value: '', label: 'Sin categoría' },
+    ...categorias.map(c => ({ value: c.id, label: c.nombre }))
+  ];
+
   return (
     <div className="fixed inset-0 bg-[var(--bg-primary)]/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="cyber-card w-full max-w-lg border-[var(--accent-secondary)]/50 shadow-cyber-fuchsia">
         <h2 className="text-xl font-black text-[var(--accent-secondary)] uppercase tracking-widest mb-6 italic">
           Modificar Registro_ID #{task.id}
         </h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Título"
@@ -94,18 +114,26 @@ const TaskEditForm = ({ task, onSubmit, onCancel, loading }) => {
             />
           </div>
 
+          <Select
+            label="Categoría"
+            name="category_id"
+            value={formData.category_id}
+            onChange={handleChange}
+            options={categoryOptions}
+          />
+
           <div className="flex gap-3 pt-4">
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={onCancel}
               className="flex-1"
             >
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
-              variant="fuchsia" 
-              disabled={loading} 
+            <Button
+              type="submit"
+              variant="fuchsia"
+              disabled={loading}
               className="flex-1"
             >
               {loading ? 'Guardando...' : 'Guardar Cambios'}

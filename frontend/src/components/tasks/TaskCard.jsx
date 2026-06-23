@@ -33,6 +33,18 @@ const TaskCard = ({ task, onEdit, onDelete }) => {
           <span className="block text-[var(--text-muted)] opacity-70">Vencimiento</span>
           <span className="text-[var(--text-secondary)]">{formatDate(task.due_date)}</span>
         </div>
+        {task.categoria_nombre && (
+          <div className="col-span-2">
+            <span className="block text-[var(--text-muted)] opacity-70">Categoría</span>
+            <span className="flex items-center gap-1 mt-0.5">
+              <span
+                className="inline-block w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: task.categoria_color || '#6366f1' }}
+              />
+              <span className="text-[var(--text-secondary)]">{task.categoria_nombre}</span>
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-color)]">

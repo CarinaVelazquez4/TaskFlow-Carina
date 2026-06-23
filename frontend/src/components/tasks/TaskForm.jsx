@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Button from '../ui/Button';
+import categoriaService from '../../services/categoryService';
 
 const TaskForm = ({ onSubmit, loading }) => {
   const initialState = {
@@ -9,11 +10,25 @@ const TaskForm = ({ onSubmit, loading }) => {
     description: '',
     priority: 'medium',
     status: 'pending',
-    due_date: ''
+    due_date: '',
+    category_id: ''
   };
 
   const [formData, setFormData] = useState(initialState);
   const [formError, setFormError] = useState('');
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    const cargarCategorias = async () => {
+      try {
+        const datos = await categoriaService.obtenerCategorias();
+        setCategorias(datos);
+      } catch (err) {
+        console.error('Error cargando categorías:', err);
+      }
+    };
+    cargarCategorias();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +39,6 @@ const TaskForm = ({ onSubmit, loading }) => {
     e.preventDefault();
     setFormError('');
 
-    // Validación básica en frontend
     if (!formData.title.trim()) {
       setFormError('El título es obligatorio.');
       return;
@@ -47,6 +61,11 @@ const TaskForm = ({ onSubmit, loading }) => {
     { value: 'pending', label: 'Pendiente' },
     { value: 'in_progress', label: 'En progreso' },
     { value: 'completed', label: 'Completada' },
+  ];
+
+  const categoryOptions = [
+    { value: '', label: 'Sin categoría' },
+    ...categorias.map(c => ({ value: c.id, label: c.nombre }))
   ];
 
   return (
@@ -92,14 +111,22 @@ const TaskForm = ({ onSubmit, loading }) => {
         />
       </div>
 
+      <Select
+        label="Categoría"
+        name="category_id"
+        value={formData.category_id}
+        onChange={handleChange}
+        options={categoryOptions}
+      />
+
       {formError && (
         <p className="text-xs text-[var(--accent-secondary)] font-bold uppercase">{formError}</p>
       )}
 
-      <Button 
-        type="submit" 
-        variant="primary" 
-        disabled={loading} 
+      <Button
+        type="submit"
+        variant="primary"
+        disabled={loading}
         className="w-full mt-4"
       >
         {loading ? 'Procesando...' : 'Crear Tarea'}

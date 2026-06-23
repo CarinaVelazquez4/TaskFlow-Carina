@@ -7,9 +7,9 @@ const { pool } = require('../config/db');
 const getAllTasks = async (req, res) => {
   try {
     const { status, priority } = req.query;
-    const user_id = req.user.id; // Obtenemos el ID del usuario autenticado
+    const user_id = req.user.id;
     
-    let query  = `
+    let query = `
       SELECT 
         t.id,
         t.title,
@@ -19,13 +19,17 @@ const getAllTasks = async (req, res) => {
         t.due_date,
         t.user_id,
         t.created_at,
-        t.updated_at
+        t.updated_at,
+        t.category_id,
+        c.nombre AS categoria_nombre,
+        c.color AS categoria_color
       FROM tasks t
+      LEFT JOIN categories c ON t.category_id = c.id
       WHERE t.user_id = $1
     `;
     
     const params = [user_id]; 
-    let   idx    = 2;   
+    let idx = 2;   
     
     if (status) {
       query += ` AND t.status = $${idx}`;
@@ -52,7 +56,7 @@ const getAllTasks = async (req, res) => {
     res.json({
       success: true,
       count: result.rows.length,
-      data:  result.rows
+      data: result.rows
     });
     
   } catch (error) {
@@ -70,14 +74,17 @@ const getTaskById = async (req, res) => {
     const user_id = req.user.id;
     
     const result = await pool.query(
-      `SELECT * FROM tasks WHERE id = $1 AND user_id = $2`,
+      `SELECT t.*, c.nombre AS categoria_nombre, c.color AS categoria_color
+       FROM tasks t
+       LEFT JOIN categories c ON t.category_id = c.id
+       WHERE t.id = $1 AND t.user_id = $2`,
       [id, user_id]
     );
     
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: `No se encontró la tarea o no tienes permiso`
+        message: 'No se encontró la tarea o no tienes permiso'
       });
     }
     
@@ -94,7 +101,7 @@ const getTaskById = async (req, res) => {
 // ─────────────────────────────────────────────────────────────
 const createTask = async (req, res) => {
   try {
-    const { title, description, status, priority, due_date } = req.body;
+    const { title, description, status, priority, due_date, category_id } = req.body;
     const user_id = req.user.id;
     
     if (!title || title.trim() === '') {
@@ -105,16 +112,17 @@ const createTask = async (req, res) => {
     }
     
     const result = await pool.query(
-      `INSERT INTO tasks (title, description, status, priority, due_date, user_id)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO tasks (title, description, status, priority, due_date, user_id, category_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
       [
         title.trim(),
         description || null,
-        status   || 'pending',
+        status || 'pending',
         priority || 'medium',
         due_date || null,
-        user_id
+        user_id,
+        category_id || null
       ]
     );
     
@@ -136,7 +144,7 @@ const createTask = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, status, priority, due_date } = req.body;
+    const { title, description, status, priority, due_date, category_id } = req.body;
     const user_id = req.user.id;
     
     if (title !== undefined && title.trim() === '') {
@@ -147,11 +155,15 @@ const updateTask = async (req, res) => {
     }
     
     // Verificamos que la tarea existe y pertenece al usuario
-    const taskExists = await pool.query('SELECT id FROM tasks WHERE id = $1 AND user_id = $2', [id, user_id]);
+    const taskExists = await pool.query(
+      'SELECT id FROM tasks WHERE id = $1 AND user_id = $2',
+      [id, user_id]
+    );
+
     if (taskExists.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: `No se encontró la tarea o no tienes permiso`
+        message: 'No se encontró la tarea o no tienes permiso'
       });
     }
     
@@ -162,15 +174,17 @@ const updateTask = async (req, res) => {
         status      = COALESCE($3::task_status, status),
         priority    = COALESCE($4::task_priority, priority),
         due_date    = COALESCE($5, due_date),
+        category_id = $6,
         updated_at  = CURRENT_TIMESTAMP
-       WHERE id = $6 AND user_id = $7
+       WHERE id = $7 AND user_id = $8
        RETURNING *`,
       [
-        title !== undefined ? title : null,
+        title !== undefined ? title.trim() : null,
         description !== undefined ? description : null,
         (status && status.trim() !== '') ? status : null,
         (priority && priority.trim() !== '') ? priority : null,
         (due_date && due_date.trim() !== '') ? due_date : null,
+        category_id || null,
         id,
         user_id
       ]
@@ -204,7 +218,7 @@ const deleteTask = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: `No se encontró la tarea o no tienes permiso`
+        message: 'No se encontró la tarea o no tienes permiso'
       });
     }
     
@@ -222,10 +236,6 @@ const deleteTask = async (req, res) => {
 // ─────────────────────────────────────────────────────────────
 // GET /api/tasks/stats — Estadísticas generales por usuario
 // ─────────────────────────────────────────────────────────────
-/**
- * Calcula el resumen de tareas agrupadas por estado para el dashboard.
- * Utiliza agregación directamente en SQL para mayor eficiencia.
- */
 const getStats = async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -257,5 +267,4 @@ const getStats = async (req, res) => {
   }
 };
 
-// Exportamos todas las funciones para usarlas en las rutas
 module.exports = { getAllTasks, getTaskById, createTask, updateTask, deleteTask, getStats };
