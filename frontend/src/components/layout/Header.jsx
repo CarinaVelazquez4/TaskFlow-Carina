@@ -30,9 +30,13 @@ const Header = () => {
                   Admin
                 </Link>
               )}
+              <Link to="/categorias" className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-secondary)] hover:text-cyber-cyan transition-colors">
+                Categorías
+              </Link>
               <Link to="/profile" className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--text-secondary)] hover:text-cyber-cyan transition-colors">
                 Perfil
               </Link>
+
             </div>
           )}
           <button 
