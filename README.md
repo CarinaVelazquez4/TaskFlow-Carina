@@ -1,18 +1,61 @@
-# TaskFlow - Gestión de Tareas
+# 🚀 TaskFlow - Sistema de Gestión de Tareas
 
 **Estudiante:** Carina Velazquez
 
 ---
 
-## Descripción de la Funcionalidad Implementada
+## 📋 Descripción del Proyecto
 
-Se implementó un módulo de **Categorías de Tareas** que permite a cada usuario organizar sus tareas mediante categorías personalizadas. Cada categoría cuenta con un nombre, descripción y un color identificador.
+TaskFlow es una aplicación web diseñada para la gestión y organización de tareas personales. Permite a los usuarios crear, administrar y dar seguimiento a sus actividades mediante una interfaz moderna e intuitiva.
 
-La funcionalidad incluye un CRUD completo con autenticación mediante tokens JWT, validaciones en el backend y una interfaz visual integrada en el frontend.
+El sistema está desarrollado utilizando:
+
+- **Frontend:** React + Vite
+- **Backend:** Node.js + Express
+- **Base de Datos:** PostgreSQL
+- **Autenticación:** JWT (JSON Web Token)
 
 ---
 
-## Estructura de la Nueva Tabla
+# ✨ Funcionalidades Principales
+
+## 👤 Gestión de Usuarios
+
+- Registro de usuarios.
+- Inicio de sesión seguro.
+- Autenticación mediante JWT.
+- Protección de rutas privadas.
+
+## ✅ Gestión de Tareas
+
+- Crear tareas.
+- Editar tareas existentes.
+- Eliminar tareas.
+- Consultar listado de tareas.
+- Marcar tareas como completadas.
+
+## 📂 Gestión de Categorías
+
+Se implementó un módulo de **Categorías de Tareas** que permite a cada usuario organizar sus tareas mediante categorías personalizadas.
+
+Cada categoría contiene:
+
+- Nombre
+- Descripción
+- Color identificador
+
+La funcionalidad incluye:
+
+- CRUD completo
+- Validaciones en backend
+- Protección mediante JWT
+- Integración visual en el frontend
+
+---
+
+# 🗄️ Estructura de la Base de Datos
+
+## Tabla Categories
 
 ```sql
 CREATE TABLE IF NOT EXISTS categories (
@@ -28,64 +71,202 @@ CREATE TABLE IF NOT EXISTS categories (
 
 ---
 
-## Endpoints Creados
+# 🔗 API REST - Categorías
+
+Todos los endpoints requieren autenticación mediante:
+
+```http
+Authorization: Bearer <token>
+```
 
 | Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/categorias` | Obtener todas las categorías del usuario |
-| GET | `/api/categorias/:id` | Obtener una categoría por ID |
-| POST | `/api/categorias` | Crear una nueva categoría |
-| PUT | `/api/categorias/:id` | Actualizar una categoría existente |
-| DELETE | `/api/categorias/:id` | Eliminar una categoría |
-
-Todos los endpoints requieren autenticación mediante token JWT en el header `Authorization: Bearer <token>`.
+|----------|----------|-------------|
+| GET | /api/categorias | Obtener todas las categorías |
+| GET | /api/categorias/:id | Obtener categoría por ID |
+| POST | /api/categorias | Crear categoría |
+| PUT | /api/categorias/:id | Actualizar categoría |
+| DELETE | /api/categorias/:id | Eliminar categoría |
 
 ---
 
-## Archivos Nuevos Agregados
+# 📁 Estructura del Proyecto
 
-### Backend
-- `src/controllers/categoryController.js` — Lógica del CRUD de categorías
-- `src/routes/categoryRoutes.js` — Rutas protegidas de categorías
-
-### Frontend
-- `src/services/categoryService.js` — Servicio de conexión con la API
-- `src/pages/CategoriesPage.jsx` — Página de gestión de categorías
-
-### Archivos Modificados
-- `src/app.js` — Registro de las rutas de categorías
-- `src/App.jsx` — Nueva ruta `/categorias`
-
-# TaskFlow System
-
-Este proyecto utiliza una arquitectura de microservicios con un Backend (Node.js/Express) y un Frontend (React/Vite).
-
-## Requisitos Previos
-
-- Node.js instalado
-- Base de Datos PostgreSQL configurada (ver `backend/.env`)
-
-## Inicio Rápido
-
-Para levantar ambos servicios (Backend y Frontend) simultáneamente con un solo comando:
-
-```bash
-npm run dev
+```text
+TaskFlow-Carina/
+│
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── routes/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   └── app.js
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── components/
+│   │   └── App.jsx
+│   └── package.json
+│
+└── package.json
 ```
 
-Este comando utiliza `concurrently` para gestionar ambos procesos en una sola terminal, etiquetando los logs para facilitar la depuración:
-- **[BACKEND]**: Logs del servidor API (Puerto 4000)
-- **[FRONTEND]**: Logs del cliente Vite (Puerto 5173)
+---
 
-## Instalación
+# 📄 Archivos Agregados para Categorías
 
-Si es la primera vez que clonas el proyecto, puedes instalar todas las dependencias con:
+## Backend
+
+- `src/controllers/categoryController.js`
+- `src/routes/categoryRoutes.js`
+
+## Frontend
+
+- `src/services/categoryService.js`
+- `src/pages/CategoriesPage.jsx`
+
+## Archivos Modificados
+
+### Backend
+
+- `src/app.js`
+
+### Frontend
+
+- `src/App.jsx`
+
+---
+
+# ⚙️ Requisitos Previos
+
+Antes de ejecutar el proyecto asegúrate de tener instalado:
+
+- Node.js 18 o superior
+- PostgreSQL
+- Git
+
+---
+
+# 🔧 Instalación
+
+## 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/CarinaVelazquez4/TaskFlow-Carina.git
+```
+
+```bash
+cd TaskFlow-Carina
+```
+
+## 2. Instalar dependencias
 
 ```bash
 npm run install-all
 ```
 
-## Estructura del Proyecto
+O manualmente:
 
-- `/backend`: API REST y conexión a base de datos.
-- `/frontend`: Interfaz de usuario Cyberpunk.
+### Backend
+
+```bash
+cd backend
+npm install
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+---
+
+# 🗃️ Configuración de Variables de Entorno
+
+Crear un archivo `.env` dentro de la carpeta `backend`.
+
+Ejemplo:
+
+```env
+PORT=4000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=tu_password
+DB_NAME=taskflow
+
+JWT_SECRET=tu_clave_secreta
+```
+
+---
+
+# ▶️ Ejecución del Proyecto
+
+## Ejecutar Backend y Frontend simultáneamente
+
+```bash
+npm run dev
+```
+
+Este comando utiliza **concurrently** para iniciar ambos servicios:
+
+- **[BACKEND]** → API REST (Puerto 4000)
+- **[FRONTEND]** → Cliente React/Vite (Puerto 5173)
+
+---
+
+# 🌐 Acceso al Sistema
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+Backend:
+
+```text
+http://localhost:4000
+```
+
+---
+
+# 🛠️ Tecnologías Utilizadas
+
+### Frontend
+
+- React
+- React Router DOM
+- Axios
+- Vite
+
+### Backend
+
+- Node.js
+- Express.js
+- JWT
+- bcrypt
+- CORS
+
+### Base de Datos
+
+- PostgreSQL
+
+---
+
+# 🎯 Objetivo del Proyecto
+
+Desarrollar una aplicación web moderna para la administración de tareas personales, permitiendo a los usuarios organizar sus actividades mediante categorías personalizadas, mejorando la productividad y la gestión eficiente del tiempo.
+
+---
+
+# 👨‍💻 Autor
+
+**Carina Velazquez**
+
